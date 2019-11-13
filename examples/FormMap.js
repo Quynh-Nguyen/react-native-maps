@@ -5,8 +5,8 @@ import { View, StyleSheet, TouchableOpacity, Text, TextInput } from 'react-nativ
 export default class FormMap extends Component {
   state = {
     open: false,
-    from: '',
-    to: '',
+    from: `${this.props.currentPosition.latitude},${this.props.currentPosition.longitude}`,
+    to: '38.785834,-121.406417',
     navigate: false
   }
 

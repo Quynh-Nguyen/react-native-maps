@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 
-import MapView, { Polyline } from 'react-native-maps';
+import MapView, { Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import carImage from './assets/car.png';
 import MapViewDirections from './Directions'
 import FormMap from './FormMap'
@@ -16,6 +16,16 @@ export default class NavigationMap extends Component {
       prevPos: null,
       curPos: { latitude: 37.785834, longitude: -122.406417 },
       carPos: { latitude: 37.785834, longitude: -122.406417 },
+      navigation: {
+        from: {
+          latitude: null,
+          longitude: null,
+        },
+        to: {
+          latitude: null,
+          longitude: null
+        }
+      },
       curAng: 45,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
@@ -25,27 +35,29 @@ export default class NavigationMap extends Component {
     this.updateMap = this.updateMap.bind(this);
   }
 
-  componentDidMount() {
-    Geolocation.getCurrentPosition((position) => {
-      this.setState({
-        prevPos: this.state.curPos,
-        curPos: {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        },
-      });
-      this.updateMap();
-    }, (error) =>console.log(error));
-
+  onMapReady() {
     Geolocation.watchPosition((position) => {
       this.setState({
         carPos: {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         },
-      });
-      this.updateMap();
+      })
+
     }, (error) =>console.log(error));
+  }
+
+  componentDidMount() {
+    // Geolocation.getCurrentPosition((position) => {
+    //   this.setState({
+    //     prevPos: this.state.curPos,
+    //     curPos: {
+    //       latitude: position.coords.latitude,
+    //       longitude: position.coords.longitude,
+    //     },
+    //   });
+
+    // }, (error) =>console.log(error));
   }
 
   componentWillUnmount() {
@@ -78,28 +90,43 @@ export default class NavigationMap extends Component {
   }
 
   onSubmit = (data) => {
-    console.log('data ', data)
+    const navigation = {
+      from: {
+        latitude: parseFloat(data.from.split(',')[0]),
+        longitude: parseFloat(data.from.split(',')[1]),
+      },
+      to: {
+        latitude: parseFloat(data.to.split(',')[0]),
+        longitude: parseFloat(data.to.split(',')[1]),
+      },
+    }
+
+    this.setState({
+      navigation: navigation
+    })
   }
 
   render() {
     return (
       <View style={styles.flex}>
         <MapView
+          provider={PROVIDER_GOOGLE}
           ref={el => (this.map = el)}
           style={styles.flex}
           minZoomLevel={15}
-          region={{
-            ...this.state.curPos,
-            latitudeDelta: this.state.latitudeDelta,
-            longitudeDelta: this.state.longitudeDelta,
-          }}
-          camera={{
+          // region={{
+          //   ...this.state.curPos,
+          //   latitudeDelta: this.state.latitudeDelta,
+          //   longitudeDelta: this.state.longitudeDelta,
+          // }}
+          initialCamera={{
             center: this.state.curPos,
             heading: 90,
             pitch: 45,
             altitude: 100,
             zoom: 25,
           }}
+          onMapReady={this.onMapReady()}
         >
           <MapView.Marker
             coordinate={
@@ -108,14 +135,16 @@ export default class NavigationMap extends Component {
             anchor={{ x: 0.5, y: 0.5 }}
             image={carImage}
           />
-          <MapViewDirections
-            origin={this.state.curPos}
-            destination={{
-              latitude: this.state.curPos.latitude + 5,
-              longitude: this.state.curPos.longitude + 5
-            }}
+          {(
+            this.state.navigation.from.latitude &&
+            this.state.navigation.from.longitude &&
+            this.state.navigation.to.latitude &&
+            this.state.navigation.to.longitude
+          ) && <MapViewDirections
+            origin={this.state.navigation.from}
+            destination={this.state.navigation.to}
             apikey="AIzaSyC6Nk_PFcJ2ucfRJ4C8-4sqVNyN9d-q61I"
-          />
+          />}
         </MapView>
         <View style={styles.buttonContainerUpDown}>
           <TouchableOpacity
@@ -145,7 +174,12 @@ export default class NavigationMap extends Component {
             <Text>+ Lng</Text>
           </TouchableOpacity>
         </View>
-        <FormMap onSubmit={this.onSubmit} />
+        {(
+          !this.state.navigation.from.latitude &&
+          !this.state.navigation.from.longitude &&
+          !this.state.navigation.to.latitude &&
+          !this.state.navigation.to.longitude
+        ) && <FormMap currentPosition={this.state.curPos} onSubmit={this.onSubmit} />}
       </View>
     );
   }

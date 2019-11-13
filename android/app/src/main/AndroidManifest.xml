@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.heredemomap">
-
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+      android:name="android.permission.INTERNET"
+    />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -22,10 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC6Nk_PFcJ2ucfRJ4C8-4sqVNyN9d-q61I" />
     </application>
-
 </manifest>

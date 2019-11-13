@@ -121,6 +121,7 @@ class MapViewDirections extends Component {
 
 		this.fetchRoute(directionsServiceBaseUrl, origin, waypoints, destination, apikey, mode, language, region, precision)
 			.then(result => {
+				console.log(result)
 				this.setState(result);
 				onReady && onReady(result);
 			})
@@ -201,7 +202,7 @@ class MapViewDirections extends Component {
 		} = this.props;
 
 		return (
-			<MapView.Polyline coordinates={this.state.coordinates} {...props} />
+			<MapView.Polyline coordinates={this.state.coordinates} {...props}/>
 		);
 	}
 
