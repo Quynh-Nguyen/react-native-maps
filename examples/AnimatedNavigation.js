@@ -6,6 +6,7 @@ import Geolocation from '@react-native-community/geolocation';
 import MapView, { Polyline } from 'react-native-maps';
 import carImage from './assets/car.png';
 import MapViewDirections from './Directions'
+import FormMap from './FormMap'
 
 
 export default class NavigationMap extends Component {
@@ -76,6 +77,10 @@ export default class NavigationMap extends Component {
     this.map.animateCamera({ heading: curRot, center: curPos, pitch: curAng });
   }
 
+  onSubmit = (data) => {
+    console.log('data ', data)
+  }
+
   render() {
     return (
       <View style={styles.flex}>
@@ -140,6 +145,7 @@ export default class NavigationMap extends Component {
             <Text>+ Lng</Text>
           </TouchableOpacity>
         </View>
+        <FormMap onSubmit={this.onSubmit} />
       </View>
     );
   }
